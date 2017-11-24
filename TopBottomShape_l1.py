@@ -117,28 +117,23 @@ def resetTopBottomDate(df, topDate, bottomDate):
             bottom.append(df.index[pEnd])
     return [top, bottom]
 
-def drawDown(df, topDate, bottomDate):
-    length = len(topDate)
-    downList = []
-    for i in range(0,length):
-        start = topDate[0]
-        p = df.index.get_loc(topDate[i]) + 1
-        count = 0
-        while count < 2:
-            if df.iloc[p].isContain:
-                p = p+1
-                continue
-            count = count+1
-            p = p+1
-        end = df.index[p]
-        downList.append([start.index, end.index])
+def drawLine(df, topDate, bottomDate):
+    topDownList = []
+    downTopList = []
+    start = topDate[0]
+    end = topDate[0]
+    for date in topDate:
+        if date < end:
+            continue
+        
+        
 
     return downList
 
-def findNextValidBottom(df, startDate, bottomDate):
+def findNextValidTopBottom(df, startDate, topBottomDate):
     p = df.index.get_loc(startDate)+1
     count = 0
-    while count < 2:
+    while count < 3:
         if df.iloc[p].isContain:
             p = p+1
             continue
@@ -147,34 +142,47 @@ def findNextValidBottom(df, startDate, bottomDate):
     end = df.index[p]
     
     i = 0
-    while bottomDate[i] < end:
+    while topBottomDate[i] < end:
         i = i+1
-    return bottomDate[i]
+    return topBottomDate[i]
 
-def findNextValidTop(df, startDate, topDate):
-    p = df.index.get_loc(startDate)+1
-    count = 0
-    while count < 2:
-        if df.iloc[p].isContain:
-            p = p+1
+##def findNextValidTop(df, startDate, topDate):
+##    p = df.index.get_loc(startDate)+1
+##    count = 0
+##    while count < 3:
+##        if df.iloc[p].isContain:
+##            p = p+1
+##            continue
+##        count = count+1
+##        p = p+1
+##    end = df.index[p]
+##    
+##    i = 0
+##    while topDate[i] < end:
+##        i = i+1
+##    return topDate[i]
+
+def howManyStickBetweenTwoPeriod(df, start, end):
+    df_s = df.ix[start]
+    df_e = df.ix[end]
+    count = 1
+    p_start = df.index.get_loc(start)+1
+    p_end = df.index.get_loc(end)
+    while p_start <= p_end:
+        if df.iloc[p_start].isContain:
+            p_start = p_start+1
             continue
-        count = count+1
-        p = p+1
-    end = df.index[p]
+        else:
+            p_start = p_start+1
+            count = count+1
+    return count
     
-    i = 0
-    while topDate[i] < end:
-        i = i+1
-    return topDate[i]
-
 
 def test():
     [df, topDate, bottomDate] = findTopBottomCR(ticker)
     [top,bottom] = resetTopBottomDate(df, topDate, bottomDate)
-    df1 = pd.DataFrame()
-    df1['top1'] = pd.Series(topDate)
-    df1['top2'] = pd.Series(top)
-    df1.to_csv('top_2.csv')
+    a = howManyStickBetweenTwoPeriod(df, top[1], bottom[1])
+    print(a)
 
 
 test()
